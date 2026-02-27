@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affinect Venue Analysis Report 2025</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p { color: #a0a0a0; font-size: 1.1em; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card h2 {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #00d9ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .stat-box {
+            background: rgba(0,217,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-box .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00d9ff;
+        }
+        .stat-box .label {
+            font-size: 0.85em;
+            color: #a0a0a0;
+            margin-top: 5px;
+        }
+        .stat-box.warning { background: rgba(255,107,107,0.1); }
+        .stat-box.warning .value { color: #ff6b6b; }
+        .stat-box.success { background: rgba(0,255,136,0.1); }
+        .stat-box.success .value { color: #00ff88; }
+        .insight-list {
+            list-style: none;
+        }
+        .insight-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .insight-list li:last-child { border-bottom: none; }
+        .insight-list .icon {
+            font-size: 1.3em;
+            min-width: 30px;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .vip-section {
+            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,107,107,0.1));
+            border: 2px solid rgba(255,215,0,0.3);
+        }
+        .vip-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .vip-card .rank {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+            min-width: 50px;
+            text-align: center;
+        }
+        .vip-card .info { flex: 1; }
+        .vip-card .name { font-weight: bold; font-size: 1.1em; }
+        .vip-card .detail { color: #a0a0a0; font-size: 0.9em; }
+        .action-list {
+            counter-reset: action;
+        }
+        .action-list li {
+            counter-increment: action;
+            padding: 15px;
+            background: rgba(0,217,255,0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 15px;
+        }
+        .action-list li::before {
+            content: counter(action);
+            background: #00d9ff;
+            color: #1a1a2e;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .trend-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .trend-badge.down { background: rgba(255,107,107,0.2); color: #ff6b6b; }
+        .trend-badge.up { background: rgba(0,255,136,0.2); color: #00ff88; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Affinect Venue Analysis Report</h1>
+            <p>Comprehensive Visit Patterns & Smart Campaign Insights | 2025</p>
+        </div>
+
+        <!-- Key Stats -->
+        <div class="grid">
+            <div class="card">
+                <h2>📊 Key Metrics</h2>
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="value">16,456</div>
+                        <div class="label">Total Visits</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="value">9,461</div>
+                        <div class="label">Unique Visitors</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="value">16</div>
+                        <div class="label">Venues</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="value">1.7</div>
+                        <div class="label">Avg Visits/Person</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>👥 Gender Breakdown</h2>
+                <div class="chart-container">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Venue Performance -->
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>🏆 Venue Performance Comparison</h2>
+            <div class="chart-container" style="height: 350px;">
+                <canvas id="venueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Monthly Trends -->
+        <div class="grid">
+            <div class="card">
+                <h2>📅 Monthly Traffic Patterns (2025)</h2>
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card warning" style="background: rgba(255,107,107,0.05);">
+                <h2>⚠️ Critical Insights</h2>
+                <ul class="insight-list">
+                    <li>
+                        <span class="icon">🎯</span>
+                        <div>
+                            <strong>Single Venue Dependency</strong>
+                            <p style="color: #a0a0a0; margin-top: 5px;">Dubai office handles 99.9% of all traffic - diversification needed</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">📉</span>
+                        <div>
+                            <strong>19% Traffic Decline</strong>
+                            <p style="color: #a0a0a0; margin-top: 5px;">Dubai office dropped from 6,750 (2024) to 5,486 (2025) visits</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">📈</span>
+                        <div>
+                            <strong>Peak Seasons Identified</strong>
+                            <p style="color: #a0a0a0; margin-top: 5px;">February (1,344) and May (1,301) = 48% of yearly traffic</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">🏅</span>
+                        <div>
+                            <strong>VIP Customers Found</strong>
+                            <p style="color: #a0a0a0; margin-top: 5px;">Only 3 men with 10+ visits - huge retention opportunity</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- VIP Section -->
+        <div class="card vip-section" style="margin-bottom: 30px;">
+            <h2>👑 VIP Male Customers (10+ Visits in 2025)</h2>
+            <div class="vip-card">
+                <div class="rank">🥇</div>
+                <div class="info">
+                    <div class="name">Jerrold Hudson</div>
+                    <div class="detail">📧 elisa35@hotmail.com | 📱 4693904321 | Age 36 | ⭐ 551 visits (1.5/day!)</div>
+                </div>
+                <span class="trend-badge up">ULTRA VIP</span>
+            </div>
+            <div class="vip-card">
+                <div class="rank">🥈</div>
+                <div class="info">
+                    <div class="name">Shanna Rosenbaum</div>
+                    <div class="detail">📧 anastasia73@yahoo.com | 📱 4065427486 | Age 68 | ⭐ 165 visits</div>
+                </div>
+                <span class="trend-badge up">HIGH VIP</span>
+            </div>
+            <div class="vip-card">
+                <div class="rank">🥉</div>
+                <div class="info">
+                    <div class="name">Rosella Fritsch</div>
+                    <div class="detail">📧 viktoria@parasol.me | 📱 5208129953 | Age 23 | ⭐ 24 visits</div>
+                </div>
+                <span class="trend-badge up">VIP</span>
+            </div>
+        </div>
+
+        <!-- Birthday Campaign -->
+        <div class="card" style="margin-bottom: 30px; background: rgba(255,193,7,0.05); border: 1px solid rgba(255,193,7,0.2);">
+            <h2>🎂 Active Campaign: Birthday Ladies (Feb 25-28)</h2>
+            <div class="stat-grid" style="margin-bottom: 20px;">
+                <div class="stat-box success">
+                    <div class="value">26</div>
+                    <div class="label">Ladies with Birthdays</div>
+                </div>
+                <div class="stat-box success">
+                    <div class="value">13</div>
+                    <div class="label">reachable (subscribed)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="value">6</div>
+                    <div class="label">Birthdays Today (Feb 25)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="value">50%</div>
+                    <div class="label">Can be contacted</div>
+                </div>
+            </div>
+            <p style="color: #a0a0a0;">📧 Ready to send:Birthday emails to Nya Murazik, Teresa Rolfson, Zula Hansen (Feb 25)</p>
+        </div>
+
+        <!-- Action Plan -->
+        <div class="card">
+            <h2>🎯 Smart Campaign Action Plan</h2>
+            <ul class="action-list">
+                <li>
+                    <div>
+                        <strong>Re-Engagement Campaign (URGENT)</strong>
+                        <p style="color: #a0a0a0; margin-top: 5px;">Target 9,461 Dubai office visitors who haven't returned in 2025</p>
+                    </div>
+                </li>
+                <li>
+                    <strong>Seasonal Promotions</strong>
+                    <p style="color: #a0a0a0; margin-top: 5px;">Launch February & May campaigns to capitalize on peak traffic months</p>
+                </li>
+                <li>
+                    <strong>VIP Loyalty Program</strong>
+                    <p style="color: #a0a0a0; margin-top: 5px;">Start with 3 identified VIPs, expand to all 10+ visit customers</p>
+                </li>
+                <li>
+                    <strong>Birthday Automation</strong>
+                    <p style="color: #a0a0a0; margin-top: 5px;">Monthly automated campaigns for 26 birthday ladies (Feb 25-28)</p>
+                </li>
+                <li>
+                    <strong>Venue Diversification</strong>
+                    <p style="color: #a0a0a0; margin-top: 5px;">Investigate and activate 15 underperforming venues</p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>Generated by Louisa | Affinect Analytics | Data from staging API (api.1503.affinect.prsl.cc)</p>
+            <p style="margin-top: 10px;">Database: 9,137 contacts | Visits analyzed: 16,456 | Report date: February 25, 2026</p>
+        </div>
+    </div>
+
+    <script>
+        // Gender Chart
+        new Chart(document.getElementById('genderChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Male (24.2%)', 'Female (23.9%)', 'Unknown (51.9%)'],
+                datasets: [{
+                    data: [2292, 2258, 4911],
+                    backgroundColor: ['#00d9ff', '#00ff88', '#666'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#fff' } }
+                }
+            }
+        });
+
+        // Venue Chart
+        new Chart(document.getElementById('venueChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Dubai office', 'Nathanael', 'Jadon', 'Eldred', 'Armani', 'Jared', 'Carmen', 'Martina', 'Yvette', 'Raul'],
+                datasets: [{
+                    label: 'Unique Visitors',
+                    data: [9461, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                    backgroundColor: '#00d9ff'
+                }, {
+                    label: 'Total Visits',
+                    data: [16447, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                    backgroundColor: '#00ff88'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#a0a0a0' } },
+                    x: { grid: { display: false }, ticks: { color: '#a0a0a0' } }
+                },
+                plugins: {
+                    legend: { labels: { color: '#fff' } }
+                }
+            }
+        });
+
+        // Monthly Chart
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: '2025 Visits',
+                    data: [539, 1344, 465, 567, 1301, 478, 91, 12, 0, 689, 8, 1],
+                    borderColor: '#00d9ff',
+                    backgroundColor: 'rgba(0, 217, 255, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#a0a0a0' } },
+                    x: { grid: { display: false }, ticks: { color: '#a0a0a0' } }
+                },
+                plugins: {
+                    legend: { labels: { color: '#fff' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
